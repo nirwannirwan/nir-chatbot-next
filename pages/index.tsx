@@ -15,10 +15,12 @@ import {
   Avatar
 } from "@chatscope/chat-ui-kit-react";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import { Transition } from "@headlessui/react";
 
 export default function Home() {
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [openChat, setOpenChat] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [messageState, setMessageState] = useState<{
     messages: Message[];
@@ -130,60 +132,71 @@ export default function Home() {
         </h1>
 
         <main>
-          <MainContainer style={{ width: "600px", minHeight: "500px" }}>
-            <ChatContainer>
-              <ConversationHeader>
-                <Avatar src="/bot-image.png" />
-                <ConversationHeader.Content userName="Chatbot AI" />
-              </ConversationHeader>
+          <button
+            className="bg-slate-700 text-slate-200 p-3 rounded-md absolute bottom-5 right-5"
+            onClick={() => setOpenChat((prev) => !prev)}
+          >
+            Open Chat
+          </button>
+          <Transition show={openChat}>
+            <div className="absolute bottom-20 right-5">
+              <MainContainer style={{ width: "600px", maxHeight: "500px" }}>
+                <ChatContainer>
+                  <ConversationHeader>
+                    <Avatar src="/bot-image.png" />
+                    <ConversationHeader.Content userName="Chatbot AI" />
+                  </ConversationHeader>
 
-              <MessageList
-                typingIndicator={
-                  loading ? (
-                    <TypingIndicator content="Pinecone is typing" />
-                  ) : null
-                }
-              >
-                {messages.map((message, index) => {
-                  return (
-                    <MessageUI
-                      key={index}
-                      style={{ width: "90%" }}
-                      model={{
-                        type: "custom",
-                        sender: message.type,
-                        position: "single",
-                        direction:
-                          message.type === "apiMessage"
-                            ? "incoming"
-                            : "outgoing"
-                      }}
-                    >
-                      <MessageUI.CustomContent>
-                        <ReactMarkdown>{message.message}</ReactMarkdown>
-                      </MessageUI.CustomContent>
-                      <MessageUI.Footer
-                        sender={
-                          message.type === "apiMessage" ? "chatbot" : "you"
-                        }
-                      />
-                    </MessageUI>
-                  );
-                })}
-              </MessageList>
-              <MessageInput
-                placeholder="Type message here"
-                onSend={handleSubmit}
-                onChange={(e, text) => {
-                  setQuery(text);
-                }}
-                sendButton={true}
-                autoFocus
-                disabled={loading}
-                attachButton={false}
-              />
-            </ChatContainer>
-          </MainContainer>
+                  <MessageList
+                    typingIndicator={
+                      loading ? (
+                        <TypingIndicator content="Chatbot is typing" />
+                      ) : null
+                    }
+                    style={{ height: "300px", overflowY: "auto" }}
+                  >
+                    {messages.map((message, index) => {
+                      return (
+                        <MessageUI
+                          key={index}
+                          style={{ width: "90%" }}
+                          model={{
+                            type: "custom",
+                            sender: message.type,
+                            position: "single",
+                            direction:
+                              message.type === "apiMessage"
+                                ? "incoming"
+                                : "outgoing"
+                          }}
+                        >
+                          <MessageUI.CustomContent>
+                            <ReactMarkdown>{message.message}</ReactMarkdown>
+                          </MessageUI.CustomContent>
+                          <MessageUI.Footer
+                            sender={
+                              message.type === "apiMessage" ? "Chatbot" : "You"
+                            }
+                          />
+                        </MessageUI>
+                      );
+                    })}
+                  </MessageList>
+                  <MessageInput
+                    placeholder="Type message here"
+                    onSend={handleSubmit}
+                    onChange={(e, text) => {
+                      setQuery(text);
+                    }}
+                    sendButton={true}
+                    autoFocus
+                    disabled={loading}
+                    attachButton={false}
+                  />
+                </ChatContainer>
+              </MainContainer>
+            </div>
+          </Transition>
           {error && (
             <div className="border border-red-400 rounded-md p-4">
               <p className="text-red-500">{error}</p>
