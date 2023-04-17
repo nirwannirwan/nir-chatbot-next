@@ -6,20 +6,36 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "type-check": "tsc --noEmit",
+    "lint": "eslint --ignore-path .gitignore \"**/*.+(ts|js|tsx)\"",
+    "format": "prettier --ignore-path .gitignore \"**/*.+(ts|js|tsx)\" --write",
+    "ingest": "tsx -r dotenv/config scripts/ingest-data.ts"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.14",
+    "@microsoft/fetch-event-source": "^2.0.1",
+    "@pinecone-database/pinecone": "^0.0.12",
+    "@radix-ui/react-accordion": "^1.1.1",
+    "autoprefixer": "10.4.14",
+    "dotenv": "^16.0.3",
+    "langchain": "^0.0.55",
+    "lucide-react": "^0.144.0",
+    "next": "13.3.0",
+    "pdf-parse": "^1.1.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-markdown": "^8.0.7"
+  },
+  "devDependencies": {
     "@types/node": "18.15.11",
     "@types/react": "18.0.35",
     "@types/react-dom": "18.0.11",
-    "autoprefixer": "10.4.14",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
-    "next": "13.3.0",
+    "prettier": "^2.8.4",
     "postcss": "8.4.21",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
     "tailwindcss": "3.3.1",
+    "tsx": "^3.12.3",
     "typescript": "5.0.4"
   }
 }
