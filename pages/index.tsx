@@ -1,17 +1,20 @@
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import styles from "@/styles/Home.module.css";
 import { Message } from "@/types/chat";
-import Image from "next/image";
 import ReactMarkdown from "react-markdown";
-import LoadingDots from "@/components/ui/LoadingDots";
 import { Document } from "langchain/document";
-// import {
-//   Accordion,
-//   AccordionContent,
-//   AccordionItem,
-//   AccordionTrigger
-// } from "@/components/ui/Accordion";
+
+import {
+  MainContainer,
+  ChatContainer,
+  MessageList,
+  Message as MessageUI,
+  MessageInput,
+  ConversationHeader,
+  TypingIndicator,
+  Avatar
+} from "@chatscope/chat-ui-kit-react";
+import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 
 export default function Home() {
   const [query, setQuery] = useState<string>("");
@@ -43,7 +46,7 @@ export default function Home() {
 
   //handle form submission
   async function handleSubmit(e: any) {
-    e.preventDefault();
+    // e.preventDefault();
 
     setError(null);
 
@@ -125,102 +128,62 @@ export default function Home() {
         <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
           Chatbot Integrate with Langchain + Open AI
         </h1>
-        <main className={styles.main}>
-          <div className={styles.cloud}>
-            <div ref={messageListRef} className={styles.messagelist}>
-              {messages.map((message, index) => {
-                let icon;
-                let className;
-                if (message.type === "apiMessage") {
-                  icon = (
-                    <Image
-                      key={index}
-                      src="/bot-image.png"
-                      alt="AI"
-                      width="40"
-                      height="40"
-                      className={styles.boticon}
-                      priority
-                    />
-                  );
-                  className = styles.apimessage;
-                } else {
-                  icon = (
-                    <Image
-                      key={index}
-                      src="/usericon.png"
-                      alt="Me"
-                      width="30"
-                      height="30"
-                      className={styles.usericon}
-                      priority
-                    />
-                  );
-                  // The latest message sent by the user will be animated while waiting for a response
-                  className =
-                    loading && index === messages.length - 1
-                      ? styles.usermessagewaiting
-                      : styles.usermessage;
+
+        <main>
+          <MainContainer style={{ width: "600px", minHeight: "500px" }}>
+            <ChatContainer>
+              <ConversationHeader>
+                <Avatar src="/bot-image.png" />
+                <ConversationHeader.Content userName="Chatbot AI" />
+              </ConversationHeader>
+
+              <MessageList
+                typingIndicator={
+                  loading ? (
+                    <TypingIndicator content="Pinecone is typing" />
+                  ) : null
                 }
-                return (
-                  <>
-                    <div key={`chatMessage-${index}`} className={className}>
-                      {icon}
-                      <div className={styles.markdownanswer}>
-                        <ReactMarkdown linkTarget="_blank">
-                          {message.message}
-                        </ReactMarkdown>
-                      </div>
-                    </div>
-                  </>
-                );
-              })}
-            </div>
-          </div>
-          <div className={styles.center}>
-            <div className={styles.cloudform}>
-              <form onSubmit={handleSubmit}>
-                <textarea
-                  disabled={loading}
-                  onKeyDown={handleEnter}
-                  ref={textAreaRef}
-                  autoFocus={false}
-                  rows={1}
-                  maxLength={512}
-                  id="userInput"
-                  name="userInput"
-                  placeholder={
-                    loading
-                      ? "Waiting for response..."
-                      : "Anything else you'd like to know?"
-                  }
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className={styles.textarea}
-                />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={styles.generatebutton}
-                >
-                  {loading ? (
-                    <div className={styles.loadingwheel}>
-                      <LoadingDots color="#000" style="small" />
-                    </div>
-                  ) : (
-                    // Send icon SVG in input field
-                    <svg
-                      viewBox="0 0 20 20"
-                      className={styles.svgicon}
-                      xmlns="http://www.w3.org/2000/svg"
+              >
+                {messages.map((message, index) => {
+                  return (
+                    <MessageUI
+                      key={index}
+                      style={{ width: "90%" }}
+                      model={{
+                        type: "custom",
+                        sender: message.type,
+                        position: "single",
+                        direction:
+                          message.type === "apiMessage"
+                            ? "incoming"
+                            : "outgoing"
+                      }}
                     >
-                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-                    </svg>
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>
+                      <MessageUI.CustomContent>
+                        <ReactMarkdown>{message.message}</ReactMarkdown>
+                      </MessageUI.CustomContent>
+                      <MessageUI.Footer
+                        sender={
+                          message.type === "apiMessage" ? "chatbot" : "you"
+                        }
+                      />
+                    </MessageUI>
+                  );
+                })}
+              </MessageList>
+              <MessageInput
+                placeholder="Type message here"
+                onSend={handleSubmit}
+                onChange={(e, text) => {
+                  setQuery(text);
+                }}
+                sendButton={true}
+                autoFocus
+                disabled={loading}
+                attachButton={false}
+              />
+            </ChatContainer>
+          </MainContainer>
           {error && (
             <div className="border border-red-400 rounded-md p-4">
               <p className="text-red-500">{error}</p>
