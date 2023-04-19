@@ -126,84 +126,78 @@ export default function Home() {
   };
   return (
     <Layout>
-      <div className="mx-auto flex flex-col gap-4">
-        <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
-          Chatbot Integrate with Langchain + Open AI
-        </h1>
+      <main>
+        <button
+          className="bg-slate-700 text-slate-200 p-3 rounded-md absolute bottom-5 right-5"
+          onClick={() => setOpenChat((prev) => !prev)}
+        >
+          Open Chat
+        </button>
+        <Transition show={openChat}>
+          <div className="absolute bottom-20 right-5">
+            <MainContainer style={{ width: "400px", maxHeight: "500px" }}>
+              <ChatContainer>
+                <ConversationHeader>
+                  <Avatar src="/bot-image.png" />
+                  <ConversationHeader.Content userName="Chatbot AI" />
+                </ConversationHeader>
 
-        <main>
-          <button
-            className="bg-slate-700 text-slate-200 p-3 rounded-md absolute bottom-5 right-5"
-            onClick={() => setOpenChat((prev) => !prev)}
-          >
-            Open Chat
-          </button>
-          <Transition show={openChat}>
-            <div className="absolute bottom-20 right-5">
-              <MainContainer style={{ width: "600px", maxHeight: "500px" }}>
-                <ChatContainer>
-                  <ConversationHeader>
-                    <Avatar src="/bot-image.png" />
-                    <ConversationHeader.Content userName="Chatbot AI" />
-                  </ConversationHeader>
-
-                  <MessageList
-                    typingIndicator={
-                      loading ? (
-                        <TypingIndicator content="Chatbot is typing" />
-                      ) : null
-                    }
-                    style={{ height: "300px", overflowY: "auto" }}
-                  >
-                    {messages.map((message, index) => {
-                      return (
-                        <MessageUI
-                          key={index}
-                          style={{ width: "90%" }}
-                          model={{
-                            type: "custom",
-                            sender: message.type,
-                            position: "single",
-                            direction:
-                              message.type === "apiMessage"
-                                ? "incoming"
-                                : "outgoing"
-                          }}
-                        >
-                          <MessageUI.CustomContent>
-                            <ReactMarkdown>{message.message}</ReactMarkdown>
-                          </MessageUI.CustomContent>
-                          <MessageUI.Footer
-                            sender={
-                              message.type === "apiMessage" ? "Chatbot" : "You"
-                            }
-                          />
-                        </MessageUI>
-                      );
-                    })}
-                  </MessageList>
-                  <MessageInput
-                    placeholder="Type message here"
-                    onSend={handleSubmit}
-                    onChange={(e, text) => {
-                      setQuery(text);
-                    }}
-                    sendButton={true}
-                    autoFocus
-                    disabled={loading}
-                    attachButton={false}
-                  />
-                </ChatContainer>
-              </MainContainer>
-            </div>
-          </Transition>
-          {error && (
-            <div className="border border-red-400 rounded-md p-4">
-              <p className="text-red-500">{error}</p>
-            </div>
-          )}
-        </main>
-      </div>
+                <MessageList
+                  typingIndicator={
+                    loading ? (
+                      <TypingIndicator content="Chatbot is typing" />
+                    ) : null
+                  }
+                  style={{ height: "300px", overflowY: "auto" }}
+                >
+                  {messages.map((message, index) => {
+                    return (
+                      <MessageUI
+                        key={index}
+                        style={{ width: "90%" }}
+                        model={{
+                          type: "custom",
+                          sender: message.type,
+                          position: "single",
+                          direction:
+                            message.type === "apiMessage"
+                              ? "incoming"
+                              : "outgoing"
+                        }}
+                      >
+                        <MessageUI.CustomContent>
+                          <ReactMarkdown>{message.message}</ReactMarkdown>
+                        </MessageUI.CustomContent>
+                        <MessageUI.Footer
+                          sender={
+                            message.type === "apiMessage" ? "Chatbot" : "You"
+                          }
+                        />
+                      </MessageUI>
+                    );
+                  })}
+                </MessageList>
+                <MessageInput
+                  placeholder="Type message here"
+                  onSend={handleSubmit}
+                  onChange={(e, text) => {
+                    setQuery(text);
+                  }}
+                  sendButton={true}
+                  autoFocus
+                  disabled={loading}
+                  attachButton={false}
+                />
+              </ChatContainer>
+            </MainContainer>
+          </div>
+        </Transition>
+        {error && (
+          <div className="border border-red-400 rounded-md p-4">
+            <p className="text-red-500">{error}</p>
+          </div>
+        )}
+      </main>
     </Layout>
   );
 }
